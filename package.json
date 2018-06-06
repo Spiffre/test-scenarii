@@ -1,0 +1,24 @@
+{
+  "name": "test-scenarii",
+  "version": "0.1.0",
+  "description": "",
+  "keywords": [],
+  "author": "Spiffre",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "scripts": {
+	"build": "babel src -d dist --ignore *.test.js",
+    "prepublish": "npm run build",
+    "test": "jest --testPathPattern=src",
+    "test:coveralls": "npm run test:coverage && cat ./coverage/lcov.info | coveralls",
+    "test:coverage": "jest --coverage"
+  },
+  "devDependencies": {
+    "babel-cli": "6.26.0",
+    "babel-core": "6.26.3",
+    "babel-jest": "23.0.1",
+    "babel-plugin-transform-es2015-modules-umd": "6.24.1",
+    "babel-preset-es2015": "6.24.1",
+    "jest": "23.1.0"
+  }
+}
