@@ -2,16 +2,18 @@
   "name": "test-scenarii",
   "version": "0.1.0",
   "description": "",
-  "keywords": [],
+  "keywords": [
+      "testing",
+      "jest",
+      "mocha"
+  ],
   "author": "Spiffre",
   "license": "MIT",
   "main": "dist/index.js",
   "scripts": {
-	"build": "babel src -d dist --ignore *.test.js",
+    "build": "babel sources/test-scenarii.js -o dist/index.js --ignore *.test.js",
     "prepublish": "npm run build",
-    "test": "jest --testPathPattern=src",
-    "test:coveralls": "npm run test:coverage && cat ./coverage/lcov.info | coveralls",
-    "test:coverage": "jest --coverage"
+    "test": "jest ./sources/"
   },
   "devDependencies": {
     "babel-cli": "6.26.0",

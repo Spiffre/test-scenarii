@@ -1,4 +1,5 @@
 
+// Return the test chain creator
 function createTestChain (getProps)
 {
 	const initialTestContext =
@@ -6,29 +7,32 @@ function createTestChain (getProps)
 		props : (typeof getProps === 'function') ? getProps() : {}
 	}
 
-	const testChain = (...middlewares) =>
+	// Return a chain
+	return (...testSteps) =>
 	{
-		// Execute the middlewares in series
-		return middlewares.reduce( (acc, middleware) =>
+		// Execute the test steps in series
+		return testSteps.reduce( (acc, testStep) =>
 		{
 			return acc.then( (testContext) =>
 			{
 				const handleReturnedValue = (returnedValue) =>
 				{
-					// If an object has been returned from the middleware, we forward it as the next testContext
+					// If an object has been returned from the test step, we forward it as the next testContext
 					if (typeof returnedValue === 'object')
 					{
+						// fixme: return updateContext(testContext, returnedValue) instead ?
+						// But only props are merged anyway ?
 						return { props : mergeProps(testContext.props, returnedValue) }
 					}
-					// If nothing was returned from the middleware, we forward the testContext
+					// If nothing was returned from the test step, we forward the testContext
 					else if ( (returnedValue === undefined) || (returnedValue === null) )
 					{
 						return testContext
 					}
 				}
 
-				// Execute the middleware
-				const res = middleware(testContext)
+				// Execute the test step
+				const res = testStep(testContext)
 
 				// If a Promise was returned from the middleware, we wait for it to resolve before handling the returned context; otherwise we handle it directly
 				return isPromise(res) ? res.then(handleReturnedValue) : handleReturnedValue(res)
@@ -36,8 +40,6 @@ function createTestChain (getProps)
 
 		}, Promise.resolve(initialTestContext) )
 	}
-
-	return testChain
 }
 
 
