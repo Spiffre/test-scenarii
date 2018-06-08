@@ -1,6 +1,6 @@
 
 // Return the test chain creator
-function createTestChain (getProps)
+export function createTestChain (getProps)
 {
 	const initialTestContext =
 	{
@@ -43,20 +43,13 @@ function createTestChain (getProps)
 }
 
 
-function setChainProps (userProps)
+export function setChainProps (userProps)
 {
 	return (testContext) =>
 	{
 		return mergeProps(testContext.props, userProps)
 	}
 }
-
-
-module.exports = {
-	createTestChain,
-	setChainProps
-}
-
 
 
 

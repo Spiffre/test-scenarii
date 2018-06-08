@@ -1,5 +1,5 @@
 
-const { createTestChain, setChainProps } = require('./test-scenarii')
+const { createTestChain, setChainProps } = require('../dist/test-scenarii.cjs')
 
 
 describe(`test-scenarii Tests`, () =>
@@ -51,7 +51,7 @@ describe(`test-scenarii Tests`, () =>
 		})
 	})
 
-	describe.only(`Basic Asynchronous Tests`, () =>
+	describe(`Basic Asynchronous Tests`, () =>
 	{
 		test(`accessing prop`, async () =>
 		{

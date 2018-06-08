@@ -1,8 +1,21 @@
 {
-  "presets": [
-    "es2015"
-  ],
-  "plugins": [
-    "transform-es2015-modules-umd"
-  ]
+	"presets" :
+	[
+		[ 
+			"env",
+			{
+				"modules": false,
+
+				"targets" :
+				{
+					"chrome": "65"
+				}
+			}
+		]
+	],
+
+	"plugins" :
+	[
+		"transform-object-rest-spread"
+	]
 }
