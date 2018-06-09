@@ -1,140 +1,135 @@
 
 # test-scenarii
 
-This package offers a way to maximize code reuse within tests, while retaining great readability.
+This package offers a way to write scenarized tests with maximum flexibility and code reuse, while retaining great readability.  
+
+The classic use case is to run several tests with very similar workflows — only with a twist each time.  
+
+Here's an example with a Todo App, where the creation of a TodoItem can be done 2 different ways: by setting a timestamp first, then the text or vice versa.  
+
+```js
+const { createTestChain, setChainProps } = require('test-scenarii')
+
+describe(`Setting datetime then text`, () =>
+{
+    let testChain = null
+
+    beforeAll( () =>
+    {
+        testChain = createTestChain({ runTests : true })
+    })
+
+    it(`must create the TodoItem from text then a datetime`, () =>
+    {
+        return testChain(
+            workflow.openApplication(),
+            workflow.clickTodoItemCreateButton(),
+            workflow.clickTimeTag(),
+            workflow.setTodoItemText(),
+            workflow.clickValidationButton()
+        )
+    })
+
+    it(`must create the TodoItem from a datetime then text`, () =>
+    {
+        return testChain(
+            setChainProps({ runTests : false }),     // Turn testing off to prevent duplicate snapshots
+            workflow.openApplication(),
+            workflow.clickTodoItemCreateButton(),
+            setChainProps({ runTests : true }),     // Turn testing back on
+            workflow.clickTimeTag(),
+            workflow.setTodoItemText(),
+            workflow.clickValidationButton()
+        )
+    })
+})
+```
+
+**GitHub coming soon**
+
+## Table of Content
+
+- [Installation](#installation)
+- [API](#api)
+    - [`createTestChain`](#createTestChain)
+    - [`createTestChainSync`](#createTestChainSync)
+    - [`setChainProps`](#setChainProps)
+- [Workflows](#workflows)
+- [How to write tests](#how-to-write-tests)
+- [License](#license)
 
 ## Installation
 
 The test-scenarii package is distributed via npm. To install it, run:
 
 ```
-    npm install -D test-scenarii
+npm install -D test-scenarii
 ```
 
 The package will be installed in the `devDependencies`, alongside the test-runner you want to use it with, whether Jest, Jasmine or Mocha.
 
-## How to write tests with test-scenarii
+## API
 
-For our example, we'll take the case of a basic todo application. To create a todo item, the user needs to:
-- Get to the application
-- Access the page where the todo items are created
-- Add both a timestamp and some text
-- Click on the creation button
+### `createTestChain`
 
-It's a fair assumption that the 1st version of the tests will look like this:
+Here's some blabla
 
 ```js
-    // 1
-    it(`must render the initial page properly`, workflow.openApplication() )
+// Initialize the chain with one set of props, no matter how many times it's used
+testChain = createTestChain({ runTests : true })
 
-    // 2
-    it(`must access the TodoItem creation page`, workflow.clickTodoItemCreateButton() )
+// or
 
-    // 3
-    it(`must add some text for the TodoItem`, workflow.setTodoItemText() )
+// Initialize the chain with a prop getter, which will be called everytime the chain is started
+// This allows for some room in the initialization of the props in subsequent chains // fixme: why not create a new chain?
+const uuid = require('uuid/v4')
+const getProps = () => ({ testRunUUID : uuid() })
 
-    // 4
-    it(`must tag the todo with a relative timestamp`, workflow.clickTimeTag() )
+let testChain = null
 
-    // 5
-    it(`must create the TodoItem`, workflow.clickValidationButton() )
-```
+beforeAll( () =>
+{
+    testChain = createTestChain(getProps)
+}
 
-Actually, the 1st version probably has the tests inlined insite the `it` statements. But step one of code reuse was to move them in functions, so we did that.  
-
-In order to somewhat exhaustive testing, however, we also need to test the exact same workflow, only with steps 3 and 4 inverted: the user first sets the timestamp, then the text. Nothing prevents you from copy-pasting the whole block of `it` statements.  
-
-The Problem is that, before execution reaches the parts that interests you in this new test, you will have tested 1 and 2 again, and for nothing: they've already been tested, and it created duplicate snapshots.  
-
-Increase the complexity of the process ever slightly, and you will end up with *a lot* of duplicates.  
-
-The Solution is to rewrite the initial test (where the user sets the text then the timestamp) as such:
-
-```js
-
-    const { createTestChain, setChainProps } = require('test-scenarii')
-
-    describe(`Setting text then datetime`, () =>
+it(`uses the created chain for the first time`, () =>
+{
+    return testChain( (ctx) =>
     {
-        let testChain = null
-
-        beforeAll( () =>
-        {
-            const getProps = () => ({ runTests : true })
-
-            testChain = createTestChain(getProps)
-        })
-
-        it(`must render the initial page properly`, () =>
-        {
-            return testChain(
-                workflow.openApplication()
-            )
-        })
-
-        it('must access the TodoItem creation page', () =>
-        {
-            return testChain(
-                workflow.clickTodoItemCreateButton()
-            )
-        })
-
-        it('must add some text for the TodoItem', () =>
-        {
-            return testChain(
-                workflow.setTodoItemText()
-            )
-        })
-
-        it('must tag the todo with a relative timestamp', () =>
-        {
-            return testChain(
-                workflow.clickTimeTag()
-            )
-        })
-
-        it(`must create the TodoItem`, () =>
-        {
-            return testChain(
-                workflow.clickValidationButton()
-            )
-        })
+        console.log(ctx.props.testRunUUID)      // A v4 UUID
     })
+})
+
+it(`uses the created chain for the first time`, () =>
+{
+    return testChain( (ctx) =>
+    {
+        console.log(ctx.props.testRunUUID)      // A totally different v4 UUID
+    })
+})
 ```
 
-Okay, so far we've made that initial test longer.  
+### `createTestChainSync`
 
-But then the second test gets to be written like this:
+Exactly the same as `createTestChain()`, except it only handle synchronous test steps
 
 ```js
-    describe(`Setting datetime then text`, () =>
-    {
-        let testChain = null
-
-        beforeAll( () =>
-        {
-            const getProps = () => ({ runTests : false })
-
-            testChain = createTestChain(getProps)
-        })
-
-        it(`must create the TodoItem`, () =>
-        {
-            return testChain(
-                workflow.openApplication(),
-                workflow.clickTodoItemCreateButton(),
-                setChainProps({ runTests : true }),     // Turn testing back on
-                workflow.clickTimeTag(),
-                workflow.setTodoItemText(),
-                workflow.clickValidationButton()
-            )
-        })
-    })
+describe(`Setting datetime then text`, () =>
+{
+    // fixme: provide examples ?
+}
 ```
 
-We have skipped the snapshot-testing for the first 2 steps, then resumed testing whenever it became interesting again.  
+### `setChainProps`
 
-Also, the high-level vue of this second test is great.
+Here's some blabla
+
+```js
+describe(`Setting datetime then text`, () =>
+{
+    
+}
+```
 
 ## License
 
