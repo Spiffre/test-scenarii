@@ -1,4 +1,49 @@
 
+
+// Return the test chain creator
+export function createTestChainSync (getProps)
+{
+	const initialTestContext =
+	{
+		props : (typeof getProps === 'function') ? getProps() : {}
+	}
+
+	// Return a chain
+	return (...testSteps) =>
+	{
+		// Execute the test steps in series
+		return testSteps.reduce( (testContext, testStep) =>
+		{
+			// Update the context with the returned props, if any
+			const handleReturnedValue = (returnedValue) =>
+			{
+				// If an object has been returned from the test step, we forward it as the next testContext
+				if (typeof returnedValue === 'object')
+				{
+					return updateContext(testContext, { props : returnedValue })
+				}
+				// If nothing was returned from the test step, we forward the testContext
+				else if ( (returnedValue === undefined) || (returnedValue === null) )
+				{
+					return testContext
+				}
+			}
+
+			// Execute the test step
+			try
+			{
+				const res = testStep(testContext)
+				return handleReturnedValue(res)
+			}
+			catch (error)
+			{
+				throw error
+			}
+
+		}, initialTestContext)
+	}
+}
+
 // Return the test chain creator
 export function createTestChain (getProps)
 {
@@ -20,9 +65,7 @@ export function createTestChain (getProps)
 					// If an object has been returned from the test step, we forward it as the next testContext
 					if (typeof returnedValue === 'object')
 					{
-						// fixme: return updateContext(testContext, returnedValue) instead ?
-						// But only props are merged anyway ?
-						return { props : mergeProps(testContext.props, returnedValue) }
+						return updateContext(testContext, { props : returnedValue })
 					}
 					// If nothing was returned from the test step, we forward the testContext
 					else if ( (returnedValue === undefined) || (returnedValue === null) )
@@ -31,11 +74,23 @@ export function createTestChain (getProps)
 					}
 				}
 
-				// Execute the test step
-				const res = testStep(testContext)
-
-				// If a Promise was returned from the middleware, we wait for it to resolve before handling the returned context; otherwise we handle it directly
-				return isPromise(res) ? res.then(handleReturnedValue) : handleReturnedValue(res)
+				// Start a new Promise chain because we don't know if testStep()'s return value is a Promise or a value
+				return Promise.resolve().then( () =>
+				{
+					return testStep(testContext)
+				})
+				// Catch any error which might have have occured when executing the test test
+				.catch( (error) =>
+				{
+					// Wrap the error in a custom type and re-throw the error to skip over the handling of the returned value
+					throw new TestStepError(error) // fixme: fuck this, just update the message instead
+				})
+				// Handle the returned value, if any
+				.then( (testStepReturnedValue) =>
+				{
+					// Return the final testContext, updated or not
+					return handleReturnedValue(testStepReturnedValue)
+				})
 			})
 
 		}, Promise.resolve(initialTestContext) )
@@ -47,7 +102,7 @@ export function setChainProps (userProps)
 {
 	return (testContext) =>
 	{
-		return mergeProps(testContext.props, userProps)
+		return updateContext(testContext, { props : userProps })
 	}
 }
 
@@ -55,32 +110,67 @@ export function setChainProps (userProps)
 
 
 
-// HELPERS
+// PRIVATE HELPERS
 //=================================================================================================
 
-function mergeProps (previousProps, updatedProps)
+function updateContext (previousContext, contextUpdate)
 {
+	// HANDLE PROPS
+
+	const updatedProps = contextUpdate.props
+
 	// Iterate on all passed properties
-	const nextProps = Object.keys(updatedProps).reduce( (contextProps, propertyName) =>
+	const nextProps = Object.keys(contextUpdate.props).reduce( (contextProps, propName) =>
 	{
-		// Error out if a property value is set but hasn't been initialized
-		if ( typeof contextProps[propertyName] === 'undefined' )
+		// Disallow if a prop's value is set on for a property that doesn't exist
+		if ( typeof contextProps[propName] === 'undefined' )
 		{
-			throw new Error(`Attempting to toggle non-existing prop ${propertyName}`)
+			throw new UnauthorizedPropChangeError(`Attempting to toggle non-existing prop: "${propName}"`)
 		}
 
 		// Set the property value
-		return Object.assign({}, contextProps, { [propertyName] : updatedProps[propertyName] })
+		return { ...contextProps, [propName] : updatedProps[propName] }
 
-	}, previousProps)
+	}, previousContext.props)
 
-	return nextProps
+	return { props : nextProps }
 }
 
 
+export class UnauthorizedPropChangeError extends Error
+{
+	constructor (message)
+	{
+		super(message);
+		this.name = this.constructor.name;
+		
+		if (typeof Error.captureStackTrace === 'function')
+		{
+			Error.captureStackTrace(this, this.constructor);
+		}
+		else
+		{ 
+			this.stack = (new Error(message)).stack; 
+		}
+	}
+}
+
+
+export class TestStepError extends Error
+{
+	constructor (error)
+	{
+		super(error.message);
+		this.name = this.constructor.name;
+		this.stack = error.stack;
+	}
+}
+
+
+/*
 function isPromise (obj)
 {
-	// fixme: error handling?
 	// fixme: hack for a node 6 bug which re-appeared? See: https://discuss.newrelic.com/t/problem-with-instanceof-promise-in-node-v6-11-5/52718
 	return (obj instanceof Promise) || ( obj && obj.constructor && (obj.constructor.name === 'Promise') )
 }
+*/
