@@ -82,6 +82,31 @@ describe(`test-scenarii Tests`, () =>
 				expect(error).toBeInstanceOf(UnauthorizedPropChangeError)
 			})
 		})
+
+		test(`using a test step which throws an error`, async () =>
+		{
+			const getProps = () => ({ someProperty : 'some value' })
+			const testChain = createTestChain(getProps)
+			
+			return testChain(
+
+				// Some async stuff which modifies the prop
+				(context) =>
+				{
+					return wait(200).then( () =>
+					{
+						undefinedVariable + 5
+					})
+				}
+			)
+
+			// Error checking
+			.catch( (error) =>
+			{
+				expect(error).not.toBeInstanceOf(UnauthorizedPropChangeError)
+				expect(error.message).toMatch(/test-scenarii caught an error while attempting to run user-provided test step #\d+:/)
+			})
+		})
 	})
 
 	describe(`Basic Synchronous Tests`, () =>

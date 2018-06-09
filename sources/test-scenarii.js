@@ -56,7 +56,7 @@ export function createTestChain (getProps)
 	return (...testSteps) =>
 	{
 		// Execute the test steps in series
-		return testSteps.reduce( (acc, testStep) =>
+		return testSteps.reduce( (acc, testStep, testStepIndex) =>
 		{
 			return acc.then( (testContext) =>
 			{
@@ -82,8 +82,10 @@ export function createTestChain (getProps)
 				// Catch any error which might have have occured when executing the test test
 				.catch( (error) =>
 				{
-					// Wrap the error in a custom type and re-throw the error to skip over the handling of the returned value
-					throw new TestStepError(error) // fixme: fuck this, just update the message instead
+					error.message = `test-scenarii caught an error while attempting to run user-provided test step #${testStepIndex}: ` + error.message
+
+					// Re-throw the error in order to skip over the handling of the returned value
+					throw error
 				})
 				// Handle the returned value, if any
 				.then( (testStepReturnedValue) =>
@@ -152,17 +154,6 @@ export class UnauthorizedPropChangeError extends Error
 		{ 
 			this.stack = (new Error(message)).stack; 
 		}
-	}
-}
-
-
-export class TestStepError extends Error
-{
-	constructor (error)
-	{
-		super(error.message);
-		this.name = this.constructor.name;
-		this.stack = error.stack;
 	}
 }
 
