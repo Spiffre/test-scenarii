@@ -18,7 +18,7 @@
   "browser": "dist/test-scenarii.umd.js",
   "scripts": {
     "dev": "rollup --config --watch --sourcemap",
-    "build": "rollup --config",
+    "build": "rollup --config --sourcemap",
     "test": "jest ./sources/",
     "pretest": "npm run build",
     "prepublish": "npm run build"

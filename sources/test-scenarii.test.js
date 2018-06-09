@@ -4,7 +4,6 @@ const {
 	createTestChainSync,
 	setChainProps,
 
-	TestStepError,
 	UnauthorizedPropChangeError
 
 } = require('../dist/test-scenarii.cjs')
@@ -14,7 +13,7 @@ describe(`test-scenarii Tests`, () =>
 {
 	describe(`Basic Asynchronous Tests`, () =>
 	{
-		test(`accessing prop`, async () =>
+		test(`accessing prop`, () =>
 		{
 			const getProps = () => ({ someProperty : 'some value' })
 			const testChain = createTestChain(getProps)
@@ -35,7 +34,7 @@ describe(`test-scenarii Tests`, () =>
 			)
 		})
 
-		test(`updating existing prop`, async () =>
+		test(`updating existing prop`, () =>
 		{
 			const getProps = () => ({ someProperty : 'some value' })
 			const testChain = createTestChain(getProps)
@@ -59,7 +58,7 @@ describe(`test-scenarii Tests`, () =>
 			)
 		})
 
-		test(`updating non-existing prop`, async () =>
+		test(`updating non-existing prop`, () =>
 		{
 			const getProps = () => ({ someProperty : 'some value' })
 			const testChain = createTestChain(getProps)
@@ -83,7 +82,7 @@ describe(`test-scenarii Tests`, () =>
 			})
 		})
 
-		test(`using a test step which throws an error`, async () =>
+		test(`using a test step which throws an error`, () =>
 		{
 			const getProps = () => ({ someProperty : 'some value' })
 			const testChain = createTestChain(getProps)
