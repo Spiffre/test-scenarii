@@ -9,9 +9,9 @@ const {
 } = require('../sources/test-scenarii.js')
 
 
-describe(`test-scenarii Tests`, () =>
+describe(`test-scenarii tests`, () =>
 {
-	describe(`Basic Asynchronous Tests`, () =>
+	describe(`Basic asynchronous tests`, () =>
 	{
 		test(`accessing prop`, () =>
 		{
@@ -108,7 +108,7 @@ describe(`test-scenarii Tests`, () =>
 		})
 	})
 
-	describe(`Sync/await Asynchronous Tests`, () =>
+	describe(`Sync/await asynchronous tests`, () =>
 	{
 		test(`accessing prop`, async () =>
 		{
@@ -199,7 +199,7 @@ describe(`test-scenarii Tests`, () =>
 		})
 	})
 
-	describe(`Basic Synchronous Tests`, () =>
+	describe(`Basic synchronous tests`, () =>
 	{
 		test(`accessing prop`, () =>
 		{
@@ -243,6 +243,69 @@ describe(`test-scenarii Tests`, () =>
 				return testChain( () => ({ someOtherProperty : 'some other value' }) )
 
 			}).toThrowError(/Attempting to toggle non-existing prop/i)
+		})
+	})
+
+	describe(`Chain initialization via static props vs prop getter`, () =>
+	{
+		test(`single run with static props`, async () =>
+		{
+			const testChain = createTestChain({ someProperty : 'some value' })
+			
+			await testChain(
+				// Actual prop checking
+				(context) =>
+				{
+					expect( context.props ).toMatchObject({ someProperty : 'some value' })
+				}
+			)
+		})
+
+		test(`multiple runs with static props`, async () =>
+		{
+			const testChain = createTestChain({ now : Date.now() })
+			let first = null, second = null
+			
+			// Store the value of prop `now`
+			await testChain( (context) => first = context.props.now )
+
+			// Store the other value of prop `now`
+			await testChain( (context) => second = context.props.now )
+
+			// Compare them
+			expect(first).toEqual(second)
+		})
+
+		test(`single run with prop getter`, async () =>
+		{
+			const testChain = createTestChain( () => ({ someProperty : 'some value' }) )
+			
+			await testChain(
+				// Actual prop checking
+				(context) =>
+				{
+					expect( context.props ).toMatchObject({ someProperty : 'some value' })
+				}
+			)
+		})
+
+		test(`multiple runs with prop getter`, async () =>
+		{
+			const testChain = createTestChain( () => ({ now : Date.now() }) )
+
+			let first = null, second = null
+			
+			// Store the value of prop `now`
+			await testChain( (context) => first = context.props.now )
+
+			// Wait a bit
+			await wait(200)
+
+			// Store the other value of prop `now`
+			await testChain( (context) => second = context.props.now )
+
+			// Compare them
+			expect(second).toBeGreaterThan(first)
 		})
 	})
 })
