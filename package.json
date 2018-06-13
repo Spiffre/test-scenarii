@@ -4,16 +4,6 @@
   "description": "",
   "author": "Spiffre",
   "license": "MIT",
-  "keywords": [
-    "testing",
-    "jest",
-    "mocha",
-    "snapshot",
-    "code reuse"
-  ],
-  "files": [
-    "dist"
-  ],
   "main": "dist/test-scenarii.cjs.js",
   "module": "dist/test-scenarii.esm.js",
   "browser": "dist/test-scenarii.umd.js",
@@ -34,5 +24,18 @@
     "rollup-plugin-babel": "3.0.4",
     "rollup-plugin-commonjs": "9.1.3",
     "rollup-plugin-node-resolve": "3.3.0"
-  }
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "tag": "next"
+  },
+  "keywords": [
+    "testing",
+    "jest",
+    "mocha",
+    "snapshot",
+    "code reuse"
+  ]
 }
