@@ -4,21 +4,12 @@
 		{
 			"type": "node",
 			"request": "launch",
-			"name": "Debugging Tests (fucked)",
-			"cwd": "${workspaceFolder}",
-			"autoAttachChildProcesses": true,
-			"runtimeExecutable": "npm",
-			"runtimeArgs": [
-				"run-script", "test"
-			],
-		},
-		{
-			"type": "node",
-			"request": "launch",
-			"name": "Debugging",
+			"name": "Debugging Tests",
 			"program": "${workspaceFolder}/node_modules/jest/bin/jest",
 			"args": [
-				"--runInBand"
+				"--runInBand",
+				"--config",
+				"${workspaceFolder}/tests/jest.config.js"
 			],
 			"runtimeArgs": [
 				"--trace-warnings"

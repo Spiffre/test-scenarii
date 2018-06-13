@@ -20,8 +20,7 @@
   "scripts": {
     "dev": "rollup --config --watch --sourcemap",
     "build": "rollup --config --sourcemap",
-    "test": "jest ./sources/",
-    "pretest": "npm run build",
+    "test": "jest ./tests/ --config ./tests/jest.config.js",
     "prepare": "npm run build"
   },
   "devDependencies": {

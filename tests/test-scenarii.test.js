@@ -6,7 +6,7 @@ const {
 
 	UnauthorizedPropChangeError
 
-} = require('../dist/test-scenarii.cjs')
+} = require('../sources/test-scenarii.js')
 
 
 describe(`test-scenarii Tests`, () =>
@@ -105,6 +105,30 @@ describe(`test-scenarii Tests`, () =>
 				expect(error).not.toBeInstanceOf(UnauthorizedPropChangeError)
 				expect(error.message).toMatch(/test-scenarii caught an error while attempting to run user-provided test step #\d+:/)
 			})
+		})
+	})
+
+	describe(`Sync/await Asynchronous Tests`, () =>
+	{
+		test(`accessing prop`, async () =>
+		{
+			const getProps = () => ({ someProperty : 'some value' })
+			const testChain = createTestChain(getProps)
+			
+			await testChain(
+
+				// Some async wait
+				async (context) =>
+				{
+					await wait(200)
+				},
+
+				// Actual prop checking
+				(context) =>
+				{debugger
+					expect( context.props ).toMatchObject({ someProperty : 'some value' })
+				}
+			)
 		})
 	})
 
