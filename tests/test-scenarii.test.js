@@ -125,10 +125,77 @@ describe(`test-scenarii Tests`, () =>
 
 				// Actual prop checking
 				(context) =>
-				{debugger
+				{
 					expect( context.props ).toMatchObject({ someProperty : 'some value' })
 				}
 			)
+		})
+
+		test(`updating existing prop`, async () =>
+		{
+			const getProps = () => ({ someProperty : 'some value' })
+			const testChain = createTestChain(getProps)
+			
+			await testChain(
+
+				// Some async stuff which modifies the prop
+				async (context) =>
+				{
+					await wait(200)
+					return { someProperty : 'some other value' }
+				},
+
+				// Actual prop checking
+				(context) =>
+				{
+					expect( context.props ).toMatchObject({ someProperty : 'some other value' })
+				}
+			)
+		})
+
+		test(`updating non-existing prop`, async () =>
+		{
+			const getProps = () => ({ someProperty : 'some value' })
+			const testChain = createTestChain(getProps)
+			
+			await testChain(
+
+				// Some async stuff which modifies the prop
+				async (context) =>
+				{
+					await wait(200)
+					return { someOtherProperty : 'some other value' }
+				}
+			)
+
+			// Error checking
+			.catch( (error) =>
+			{
+				expect(error).toBeInstanceOf(UnauthorizedPropChangeError)
+			})
+		})
+
+		test(`using a test step which throws an error`, async () =>
+		{
+			const getProps = () => ({ someProperty : 'some value' })
+			const testChain = createTestChain(getProps)
+			
+			await testChain(
+
+				// Some async stuff which modifies the prop
+				async (context) =>
+				{
+					await wait(200)
+					undefinedVariable + 5
+				}
+			)
+
+			// Error checking
+			.catch( (error) =>
+			{
+				expect(error).not.toBeInstanceOf(UnauthorizedPropChangeError)
+				expect(error.message).toMatch(/test-scenarii caught an error while attempting to run user-provided test step #\d+:/)
+			})
 		})
 	})
 
