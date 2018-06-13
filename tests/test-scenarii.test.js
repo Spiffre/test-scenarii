@@ -237,12 +237,27 @@ describe(`test-scenarii tests`, () =>
 			const getProps = () => ({ someProperty : 'some value' })
 			const testChain = createTestChainSync(getProps)
 
-			// fixme: this expect() fails because...?
 			expect( () =>
 			{
 				return testChain( () => ({ someOtherProperty : 'some other value' }) )
 
 			}).toThrowError(/Attempting to toggle non-existing prop/i)
+		})
+
+		test(`using a test step which throws an error`, () =>
+		{
+			const getProps = () => ({ someProperty : 'some value' })
+			const testChain = createTestChainSync(getProps)
+
+			try
+			{
+				testChain( (context) => (undefinedVariable + 5) )
+			}
+			catch (error)
+			{
+				expect(error).not.toBeInstanceOf(UnauthorizedPropChangeError)
+				expect(error.message).toMatch(/test-scenarii caught an error while attempting to run user-provided test step #\d+:/)
+			}
 		})
 	})
 
