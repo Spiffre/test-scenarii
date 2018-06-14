@@ -37,8 +37,8 @@ describe(`Setting datetime then text`, () =>
             testStep.openApplication(),
             testStep.clickTodoItemCreateButton(),
             setChainProps({ runTests : true }),     // Turn testing back on
-            testStep.clickTimeTag(),
-            testStep.setTodoItemText(),
+			testStep.setTodoItemText(),
+			testStep.clickTimeTag(),
             testStep.clickValidationButton()
         )
     })
@@ -51,9 +51,9 @@ describe(`Setting datetime then text`, () =>
 
 - [Installation](#installation)
 - [API](#api)
-    - [`createTestChain`](#createTestChain)
-    - [`createTestChainSync`](#createTestChainSync)
-    - [`setChainProps`](#setChainProps)
+    - [`createTestChain`](#createtestchain)
+    - [`createTestChainSync`](#createtestchainsync)
+    - [`setChainProps`](#setchainprops)
 - [Test Steps](#test-steps)
 - [License](#license)
 
