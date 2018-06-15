@@ -37,8 +37,8 @@ describe(`Setting datetime then text`, () =>
             testStep.openApplication(),
             testStep.clickTodoItemCreateButton(),
             setChainProps({ runTests : true }),     // Turn testing back on
-			testStep.setTodoItemText(),
-			testStep.clickTimeTag(),
+			testStep.setTodoItemText(),             // Notice clickTimeTag() and setTodoItemText()
+			testStep.clickTimeTag(),                // are inverted here, compared to the previous test
             testStep.clickValidationButton()
         )
     })
