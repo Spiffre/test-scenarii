@@ -192,7 +192,7 @@ const testChain = createTestChain(
 {
     runTests: true,
     takeScreenshots: false,
-    page: browser.newPage
+    page: page
 })
 ```
 
