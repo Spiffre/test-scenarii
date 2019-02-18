@@ -152,7 +152,7 @@ it(`makes no difference whether you use setChainProps() or a regular test step`,
 
 ## Test Steps
 
-The way the test steps are structure is key. The bare minimum they should do is separate the action they perform from the test they perform, in a way to is prop-controlled.  
+The way the test steps are structured is key. The bare minimum they should do is separate the action they perform from the test they perform, in a way to is prop-controlled.  
 
 Examples use Puppeteer to navigate a project via Chromium instance.  
 
