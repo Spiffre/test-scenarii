@@ -1,21 +1,17 @@
 
 export function setChainProps (userProps)
 {
-	return (testContext) =>
+	return (ctx, props) =>
 	{
-		return updateContext(testContext, { props : userProps })
+		return userProps
 	}
 }
 
 
-export function updateContext (previousContext, contextUpdate)
+export function mergeProps (previousProps, nextProps)
 {
-	// HANDLE PROPS
-
-	const updatedProps = contextUpdate.props
-
 	// Iterate on all passed properties
-	const nextProps = Object.keys(contextUpdate.props).reduce( (contextProps, propName) =>
+	return Object.keys(nextProps).reduce( (contextProps, propName) =>
 	{
 		// Disallow if a prop's value is set on for a property that doesn't exist
 		if ( typeof contextProps[propName] === 'undefined' )
@@ -24,11 +20,9 @@ export function updateContext (previousContext, contextUpdate)
 		}
 
 		// Set the property value
-		return { ...contextProps, [propName] : updatedProps[propName] }
+		return { ...contextProps, [propName] : nextProps[propName] }
 
-	}, previousContext.props)
-
-	return { props : nextProps }
+	}, previousProps)
 }
 
 

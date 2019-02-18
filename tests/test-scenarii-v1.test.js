@@ -9,7 +9,7 @@ const {
 } = require('../sources/test-scenarii.js')
 
 
-describe(`test-scenarii tests`, () =>
+describe.skip(`test-scenarii tests (old API)`, () =>
 {
 	describe(`Basic asynchronous tests`, () =>
 	{
