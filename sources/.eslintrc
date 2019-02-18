@@ -1,0 +1,6 @@
+{
+	"extends": [
+		"../devenv/eslint/env.sources.js",
+		"../devenv/eslint/ide.js"
+	]
+} 

@@ -23,10 +23,10 @@ export function createTestChain (initialProps)
 			initialTestContext.props = initialProps()
 		}
 
-		// Execute the test steps in series
-		return testSteps.reduce( (testContext, testStep, testStepIndex) =>
+		// Execute the test steps in sequence
+		return testSteps.reduce( (acc, testStep, testStepIndex) =>
 		{
-			return testContext.then( (testContext) =>
+			return acc.then( (testContext) =>
 			{
 				const handleReturnedValue = (returnedValue) =>
 				{
@@ -35,11 +35,9 @@ export function createTestChain (initialProps)
 					{
 						return updateContext(testContext, { props : returnedValue })
 					}
+					
 					// If nothing was returned from the test step, we forward the testContext
-					else if ( (returnedValue === undefined) || (returnedValue === null) )
-					{
-						return testContext
-					}
+					return testContext
 				}
 
 				// Start a new Promise chain because we don't know if testStep()'s return value is a Promise or a value
@@ -97,10 +95,7 @@ export function createTestChainSync (initialProps)
 					return updateContext(testContext, { props : returnedValue })
 				}
 				// If nothing was returned from the test step, we forward the testContext
-				else if ( (returnedValue === undefined) || (returnedValue === null) )
-				{
-					return testContext
-				}
+				return testContext
 			}
 
 			// Execute the test step
