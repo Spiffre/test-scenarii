@@ -28,7 +28,8 @@
     "rollup-plugin-node-resolve": "4.0.0"
   },
   "files": [
-    "dist"
+	"dist",
+	"CHANGELOG.md"
   ],
   "publishConfig": {
     "tag": "next"
