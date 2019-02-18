@@ -7,7 +7,8 @@ module.exports = babelJest.createTransformer(
 	babelrc : false,
 	presets :
 	[
-		[ 'env',
+		[
+			'@babel/preset-env',
 			{
 				targets :
 				{
@@ -19,6 +20,6 @@ module.exports = babelJest.createTransformer(
 
 	plugins :
 	[
-		'transform-object-rest-spread'
+		'@babel/plugin-proposal-object-rest-spread'
 	]
 })
