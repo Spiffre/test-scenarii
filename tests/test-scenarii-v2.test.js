@@ -1,13 +1,11 @@
 
 const {
+	createTestChain,
 	createTestChainSync,
 	setChainProps,
 
-	UnauthorizedPropChangeError
+} = require('../dist/test-scenarii.esm.js')
 
-} = require('../sources/test-scenarii.js')
-
-const { createTestChain } = require('../sources/async.js')
 
 
 describe(`test-scenarii tests`, () =>

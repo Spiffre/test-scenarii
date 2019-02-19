@@ -1,12 +1,9 @@
 
 ## Current
 
-Reconfigure tests to point to the `npm run dev` version
-Is there in Rollup a write-file-devserver??
+Nested workflows!!
 
 Refactor to have named functions
-
-Nested workflows!!
 
 Put back the prop getter in place of a prop object?
 `const getProps = () => ({ someProperty : 'some value' })`
@@ -15,42 +12,10 @@ Is there a use case for this?
 
 
 
-## From Before 
-
-https://github.com/mattphillips/jest-each
-https://docs.npmjs.com/misc/developers : npmignore/gitignore
-https://babeljs.io/docs/usage/cli/
-
-
-v2 can't work because, by relying on the underlying it/test, we save some code in terms of scheduling,
-but we can't return props and update context.
-
-Updates for test-scenarii
-
-0.4:0: 
-- Add the names function option; default to numbered log and a warning that it would be better with named functions
-- Update the docs to explain naming 
-- Add CHANGELOG file
-
-v0.5.0:
-- Add new API under /experimental
-- Create a describe() which takes the string provided by the user. Have a beforeAll() which caries the context for the whole block and have a beforeEach() if needed.
-- Most importantly: don’t call the function for each test step directly: call it via high-order function which captures the returned value and updates the context if needed, the returns the Promise if it is one. 
-- Curry settings/props init because it’s not the same frequency: testChainCreator(), createTestChain() and describeTestChain() ?
-- “Instead of hand-rolling our own logic, why not let the test runner do it?”
-- 
 
 
 
-
-
-
-
-
-
-
-
-// v0.2.0
+## Test Factory Version
 
 testChain = createTestChain({
 	runTests : true,

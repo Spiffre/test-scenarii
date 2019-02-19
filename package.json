@@ -8,9 +8,10 @@
   "module": "dist/test-scenarii.esm.js",
   "browser": "dist/test-scenarii.umd.js",
   "scripts": {
-    "dev": "rollup --config --watch --sourcemap",
+    "start": "rollup --config --watch --sourcemap",
     "build": "rollup --config --sourcemap",
-    "test": "jest ./tests/ --config ./tests/jest.config.js",
+	"test": "jest ./tests/ --config ./tests/jest.config.js",
+	"test:watch": "jest ./tests/ --config ./tests/jest.config.js --watch",
     "prepare": "npm run build"
   },
   "devDependencies": {
