@@ -1,9 +1,14 @@
 
 import {
 	setChainProps,
-	updateContext,
+} from './utils.js'
+
+import {
 	UnauthorizedPropChangeError
-} from './utils'
+} from './utils_DEPRECATED.js'
+
+import './async.js'
+import './sync.js'
 
 import { createTestChain } from './async_DEPRECATED.js'
 import { createTestChain as createTestChainSync } from './sync_DEPRECATED.js'

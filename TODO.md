@@ -1,22 +1,18 @@
 
 ## Current
 
-But, if the context is frozend and can't be changed, and the props can, do we still need the mergeProps() check-up ?
-
-createTestChain(context, props)
-ctx.page.click(SELECTOR)
-ctx.props.takeScreenshots)
+Reconfigure tests to point to the `npm run dev` version
+Is there in Rollup a write-file-devserver??
 
 Refactor to have named functions
 
-Reconfigure tests to point to the `npm run dev` version
-Is there in Rollup a write-file-devserver??
+Nested workflows!!
 
 Put back the prop getter in place of a prop object?
 `const getProps = () => ({ someProperty : 'some value' })`
 Is there a use case for this?
 
-Nested workflows!!
+
 
 
 ## From Before 

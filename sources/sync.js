@@ -1,7 +1,4 @@
 
-import { updateContext } from './utils.js'
-
-
 export function createTestChain (initialProps)
 {
 	// Cache initialProps directly if it's an object
