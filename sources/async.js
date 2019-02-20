@@ -16,8 +16,8 @@ export function createTestChain (initialContext, initialProps)
 				})
 				// Catch any error which might have have occured when executing the test test
 				.catch( (error) =>
-				{
-					const testId = (testStep.name === '') ? testStep.name : ('#' + testStepIndex)
+				{debugger
+					const testId = (testStep.name === '') ? `#${testStepIndex}` : `#${testStepIndex} "${testStep.name}"`
 					error.message = `test-scenarii caught an error while attempting to run user-provided test step ${testId}:\n` + error.message
 
 					// Re-throw the error in order to skip over the handling of the returned value

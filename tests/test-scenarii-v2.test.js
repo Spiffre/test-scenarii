@@ -120,13 +120,12 @@ describe(`test-scenarii tests`, () =>
 			)
 		})
 
-		test(`using a test step which throws an error`, async () =>
+		test(`using a test step which throws an error (anonymous function)`, async () =>
 		{
 			const testChain = createTestChain()
 			
 			return testChain(
 
-				// Some async stuff which modifies the prop
 				async (ctx, props) =>
 				{
 					await wait(200)
@@ -138,7 +137,28 @@ describe(`test-scenarii tests`, () =>
 			.catch( (error) =>
 			{
 				expect(error).toBeInstanceOf(Error)
-				expect(error.message).toMatch('test-scenarii caught an error while attempting to run user-provided test')
+				expect(error.message).toMatch('test-scenarii caught an error while attempting to run user-provided test step #0:')
+			})
+		})
+
+		test(`using a test step which throws an error (named function)`, async () =>
+		{
+			const testChain = createTestChain()
+			
+			return testChain(
+
+				async function doingSomethingReprehensible (ctx, props)
+				{
+					await wait(200)
+					undefinedVariable + 5
+				}
+			)
+
+			// Error checking
+			.catch( (error) =>
+			{
+				expect(error).toBeInstanceOf(Error)
+				expect(error.message).toMatch('test-scenarii caught an error while attempting to run user-provided test step #0 "doingSomethingReprehensible":')
 			})
 		})
 	})
