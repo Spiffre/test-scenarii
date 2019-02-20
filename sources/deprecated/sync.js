@@ -1,5 +1,5 @@
 
-import { updateContext } from './utils_DEPRECATED.js'
+import { updateContext } from './deprecated/utils.js'
 
 
 export function createTestChain (initialProps)
