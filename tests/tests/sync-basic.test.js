@@ -5,64 +5,138 @@ const { wait } = require('./utils.js')
 
 describe(`Synchronous Chains`, () =>
 {
-	describe.skip(`Basic Tests`, () =>
+	describe(`Basic Tests`, () =>
 	{
-		test(`accessing prop`, () =>
+		test(`Running a test step with empty context and prop objects`, () =>
 		{
-			const getProps = () => ({ someProperty : 'some value' })
-			const testChain = createTestChainSync(getProps)
-			
-			testChain(
-				(context) =>
-				{
-					expect(context.props).toMatchObject({ someProperty : 'some value' })
-				}
-			)
-		})
+			const testChain = createTestChainSync({}, {})
 
-		test(`updating existing prop`, () =>
-		{
-			const getProps = () => ({ someProperty : 'some value' })
-			const testChain = createTestChainSync(getProps)
-			
 			testChain(
-				(context) =>
+
+				(ctx, props) =>
 				{
-					return { someProperty : 'some other value' }
+					// Do nothing
 				},
 
-				(context) =>
+				// Actual context and prop checking
+				(ctx, props) =>
 				{
-					expect(context.props).toMatchObject({ someProperty : 'some other value' })
+					expect(ctx).toMatchObject({})
+					expect(props).toMatchObject({})
 				}
 			)
 		})
 
-		test(`updating non-existing prop`, () =>
+		test(`Running a test step with null context and prop objects`, () =>
 		{
-			const getProps = () => ({ someProperty : 'some value' })
-			const testChain = createTestChainSync(getProps)
+			const testChain = createTestChainSync(null, null)
+			
+			testChain(
 
-			expect( () =>
-			{
-				return testChain( () => ({ someOtherProperty : 'some other value' }) )
+				(ctx, props) =>
+				{
+					// Do nothing
+				},
 
-			}).toThrowError(/Attempting to toggle non-existing prop/i)
+				// Actual context and prop checking
+				(ctx, props) =>
+				{
+					expect(ctx).toMatchObject({})
+					expect(props).toMatchObject({})
+				}
+			)
 		})
 
-		test(`using a test step which throws an error`, () =>
+		test(`Running a test step with undefined context and prop objects`, () =>
 		{
-			const getProps = () => ({ someProperty : 'some value' })
-			const testChain = createTestChainSync(getProps)
+			const testChain = createTestChainSync(undefined, undefined)
+			
+			testChain(
 
+				(ctx, props) =>
+				{
+					// Do nothing
+				},
+
+				// Actual context and prop checking
+				(ctx, props) =>
+				{
+					expect(ctx).toMatchObject({})
+					expect(props).toMatchObject({})
+				}
+			)
+		})
+
+		test(`Running a test step with actual context and prop objects`, () =>
+		{
+			const testChain = createTestChainSync({ contextStuff : 'Some context stuff' }, { propStuff : 'Some prop stuff' })
+			
+			testChain(
+				(ctx, props) =>
+				{
+					expect(props).toMatchObject({ propStuff : 'Some prop stuff' })
+					expect(Object.keys(props)).toHaveLength(1)
+
+					expect(ctx).toMatchObject({ contextStuff : 'Some context stuff' })
+					expect(Object.keys(ctx)).toHaveLength(1)
+				}
+			)
+		})
+
+		test(`Updating prop`, () =>
+		{
+			const testChain = createTestChainSync({}, { propStuff : 'Some prop stuff' })
+			
+			testChain(
+				(ctx, props) =>
+				{
+					return { propStuff : 'some other prop stuff' }
+				},
+
+				(ctx, props) =>
+				{
+					expect(props).toHaveProperty('propStuff', 'some other prop stuff')
+				}
+			)
+		})
+
+		test(`Using a test step which throws an error (anonymous function)`, () =>
+		{
+			const testChain = createTestChainSync()
+			
 			try
 			{
-				testChain( (context) => (undefinedVariable + 5) ) // eslint-disable-line no-magic-numbers, no-undef
+				testChain(
+					(ctx, props) =>
+					{
+						undefinedVariable + 5 // eslint-disable-line no-magic-numbers, no-undef
+					}
+				)
 			}
 			catch (error)
 			{
-				expect(error).not.toBeInstanceOf(UnauthorizedPropChangeError) // eslint-disable-line
-				expect(error.message).toMatch(/test-scenarii caught an error while attempting to run user-provided test step #\d+:/)
+				expect(error).toBeInstanceOf(Error)
+				expect(error.message).toMatch('test-scenarii caught an error while attempting to run user-provided test step #0:')
+			}
+		})
+
+		test(`Using a test step which throws an error (named function)`, () =>
+		{
+			const testChain = createTestChainSync()
+			
+			try
+			{
+				testChain(
+					function doingSomethingReprehensible (ctx, props)
+					{
+						undefinedVariable + 5 // eslint-disable-line no-magic-numbers, no-undef
+					}
+				)
+			}
+			catch (error)
+			{
+				expect(error).toBeInstanceOf(Error)
+				expect(error.message).toMatch('test-scenarii caught an error while attempting to run user-provided test step #0 "doingSomethingReprehensible":')
 			}
 		})
 	})

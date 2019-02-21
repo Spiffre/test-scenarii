@@ -1,58 +1,57 @@
 
+/**
+ * Return an asynchronous chain
+ * @param {object} initialContext 
+ * @param {object} initialProps 
+ * @returns {function}
+ */
 export function createTestChain (initialContext, initialProps)
 {
-	// Return a chain
-	return function testChain (...testSteps)
+	/**
+	 * Return an asynchronous chain
+	 * @param {...function} testSteps The list of test steps in the chain
+	 * @returns {object} The final props, possibly updated by each test step
+	 */
+	return async function testChain (...testSteps)
 	{
-		const seedContext =
+		let testContext =
 		{
 			ctx : Object.freeze( initialContext || {} ),
 			props : initialProps || {}
 		}
 
-		// Execute the test steps in sequence
-		return testSteps.reduce( (acc, testStep, testStepIndex) =>
+		let testStepIndex = 0
+
+		for (const testStep of testSteps)
 		{
-			return acc.then( (testContext) =>
+			try
 			{
-				// Start a new Promise chain because we don't know if testStep()'s return value is a Promise or a value
-				return Promise.resolve().then( () =>
-				{
-					return testStep(testContext.ctx, testContext.props)
-				})
-				// Catch any error which might have have occured when executing the test test
-				.catch( (error) =>
-				{
-					const testId = (testStep.name === '') ? `#${testStepIndex}` : `#${testStepIndex} "${testStep.name}"`
-					error.message = `test-scenarii caught an error while attempting to run user-provided test step ${testId}:\n` + error.message
+				// Execute the testStep and pass it the current ctx and the props
+				const updatedProps = await testStep(testContext.ctx, testContext.props)
 
-					// Re-throw the error in order to skip over the handling of the returned value
-					throw error
-				})
-				// Handle the returned value, if any
-				.then( (returnedProps) =>
+				// If props have been returned from the test step, we merge the props before returning the testContext
+				if (updatedProps)
 				{
-					const updatedProps = returnedProps || {}
+					const nextProps = { ...testContext.props, ...updatedProps }
+					testContext = { ...testContext, props : nextProps }
+				}
 
-					// If an object has been returned from the test step, we forward it as the next testContext
-					if (typeof updatedProps === 'object') // fixme: make a more restrictive check to be sure it's a POO?
-					{
-						return {
-							ctx : testContext.ctx,
-							props : { ...testContext.props, ...updatedProps }
-						}
-					}
-					
-					// If nothing was returned from the test step, we forward the testContext
-					return testContext
-				})
-			})
+				// Otherwise, testContext remains the same
+			}
+			catch (error)
+			{
+				const testId = (testStep.name === '') ? `#${testStepIndex}` : `#${testStepIndex} "${testStep.name}"`
+				error.message = `test-scenarii caught an error while attempting to run user-provided test step ${testId}:\n` + error.message
 
-		}, Promise.resolve(seedContext) )
-		.then( ({ props }) =>
-		{
-			return props
-		})
+				// Re-throw the error in order to skip over the handling of the returned value
+				throw error
+			}
+
+			testStepIndex++
+		}
+
+		// Return the final props just in case
+		return testContext.props
 	}
 }
 

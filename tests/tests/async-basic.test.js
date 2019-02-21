@@ -12,7 +12,7 @@ describe(`Asynchronous Chains`, () =>
 		test(`Running a test step with empty context and prop objects`, () =>
 		{
 			const testChain = createTestChain({}, {})
-			
+
 			return testChain(
 
 				// Some async wait
@@ -22,7 +22,9 @@ describe(`Asynchronous Chains`, () =>
 				},
 
 				// Actual context and prop checking
-				(ctx, props) =>
+				// fixme: this one needs to be async, otherwise it gets executed before the one before resolves...
+				// That's an unpleasant surprise
+				async (ctx, props) =>
 				{
 					expect(ctx).toMatchObject({})
 					expect(props).toMatchObject({})
@@ -72,7 +74,7 @@ describe(`Asynchronous Chains`, () =>
 			)
 		})
 
-		test(`Accessing context and prop`, () =>
+		test(`Running a test step with actual context and prop objects`, () =>
 		{
 			const testChain = createTestChain({ contextStuff : 'Some context stuff' }, { propStuff : 'Some prop stuff' })
 			
