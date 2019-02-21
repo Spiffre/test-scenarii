@@ -10,7 +10,7 @@ const {
 
 describe(`test-scenarii tests`, () =>
 {
-	describe.only(`Basic asynchronous tests`, () =>
+	describe(`Basic asynchronous tests`, () =>
 	{
 		test(`running a test step with empty context and prop objects`, async () =>
 		{
@@ -163,9 +163,39 @@ describe(`test-scenarii tests`, () =>
 		})
 	})
 
-	describe(`Nested async workflows`, () =>
+	describe.only(`Nested asynchronous tests`, () =>
 	{
-		// DO IT
+		test(`running a test step with empty context and prop objects`, async () =>
+		{
+			// Create the primary/parent chain
+			const primaryChain = createTestChain({ contextStuff : "value" }, { propStuff : "value", count : 0 })
+			
+			// Create the secondary/nested chain. It will inherit the context and the props when the time comes
+			const nestedChain = createTestChain.nested(
+				async (ctx, props) =>
+				{
+					await wait(200)
+					return { count : props.count + 1 }
+				}
+			)
+
+			// Run the primary chainm which will execute the nested chain in between regular test steps
+			return primaryChain(
+				async (ctx, props) =>
+				{
+					await wait(200)
+					return { count : props.count + 1 }
+				},
+
+				nestedChain,
+
+				async (ctx, props) =>
+				{
+					await wait(200)
+					return { count : props.count + 1 }
+				}
+			)
+		})
 	})
 
 	describe(`Basic synchronous tests`, () =>

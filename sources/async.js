@@ -2,8 +2,14 @@
 export function createTestChain (initialContext, initialProps)
 {
 	// Return a chain
-	return (...testSteps) =>
+	return function testChain (...testSteps)
 	{
+		const seedContext =
+		{
+			ctx : Object.freeze( initialContext || {} ),
+			props : initialProps || {}
+		}
+
 		// Execute the test steps in sequence
 		return testSteps.reduce( (acc, testStep, testStepIndex) =>
 		{
@@ -42,11 +48,29 @@ export function createTestChain (initialContext, initialProps)
 				})
 			})
 
-		},
-		Promise.resolve(
+		}, Promise.resolve(seedContext) )
+		.then( ({ props }) =>
 		{
-			ctx : Object.freeze( initialContext || {} ),
-			props : initialProps || {}
-		}) )
+			return props
+		})
 	}
 }
+
+createTestChain.nested = function nestedTestChain (...testSteps)
+{
+	/**
+	 * Context and props are inherited from the parent chain whenever the nested chain is encountered, 
+	 * in order to ensure they are up-to-date
+	 * @param {object} ctx
+	 * @param {object} props
+	 * @returns {object} The updated props
+	 */
+	return (ctx, props) =>
+	{
+		// Call createTestChain() to effectively create a test chain with the provided context and props
+		// and immediately execute it with the provided test steps
+		return this(ctx, props)(...testSteps)
+	}
+}
+
+createTestChain.nest = createTestChain.nested
