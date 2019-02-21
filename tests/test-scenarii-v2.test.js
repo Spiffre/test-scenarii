@@ -163,6 +163,11 @@ describe(`test-scenarii tests`, () =>
 		})
 	})
 
+	describe(`Nested async workflows`, () =>
+	{
+		// DO IT
+	})
+
 	describe(`Basic synchronous tests`, () =>
 	{
 		test(`accessing prop`, () =>
