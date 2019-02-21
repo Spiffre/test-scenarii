@@ -67,10 +67,10 @@ createTestChain.nested = function nestedTestChain (...testSteps)
 	 */
 	return (ctx, props) =>
 	{
-		// Call createTestChain() to effectively create a test chain with the provided context and props
-		// and immediately execute it with the provided test steps
+		/**
+		 * Call createTestChain() to effectively create a test chain with the provided context and props
+		 * and immediately execute it with the provided test steps
+		 */
 		return this(ctx, props)(...testSteps)
 	}
 }
-
-createTestChain.nest = createTestChain.nested

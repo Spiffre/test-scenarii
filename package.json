@@ -10,8 +10,8 @@
   "scripts": {
     "start": "rollup --config --watch --sourcemap",
     "build": "rollup --config --sourcemap",
-	"test": "jest ./tests/ --config ./tests/jest.config.js",
-	"test:watch": "jest ./tests/ --config ./tests/jest.config.js --watch",
+	"test": "jest ./tests/tests/ --config ./tests/jest.config.js",
+	"test:watch": "jest ./tests/tests/ --config ./tests/jest.config.js --watch",
     "prepare": "npm run build"
   },
   "devDependencies": {
