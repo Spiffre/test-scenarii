@@ -1,6 +1,6 @@
 {
   "name": "test-scenarii",
-  "version": "0.2.41",
+  "version": "0.2.42",
   "description": "",
   "author": "Spiffre",
   "license": "MIT",
@@ -33,7 +33,7 @@
 	"CHANGELOG.md"
   ],
   "publishConfig": {
-    "tag": "next"
+    "tag": "canary"
   },
   "keywords": [
     "testing",
