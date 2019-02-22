@@ -1,15 +1,15 @@
 
 ## Current
 
-Nested workflows!!
+Write nested sync tests
 
 Put back the prop getter in place of a prop object?
 `const getProps = () => ({ someProperty : 'some value' })`
 Is there a use case for this?
 
-Update docs
+Warning or error on anonymous tests?
 
-Write sync version !!
+
 
 
 
