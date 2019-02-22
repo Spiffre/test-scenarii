@@ -1,9 +1,10 @@
 {
   "name": "test-scenarii",
-  "version": "0.2.42",
+  "version": "1.0.0-rc",
   "description": "",
   "author": "Spiffre",
   "license": "MIT",
+  "homepage": "https://github.com/spiffre/test-scenarii",
   "main": "dist/test-scenarii.cjs.js",
   "module": "dist/test-scenarii.esm.js",
   "browser": "dist/test-scenarii.umd.js",
@@ -31,8 +32,12 @@
     "dist",
     "CHANGELOG.md"
   ],
+  "repository": {
+	"type": "git",
+	"url": "https://github.com/spiffre/test-scenarii"
+  },
   "publishConfig": {
-    "tag": "canary"
+    "tag": "next"
   },
   "keywords": [
     "testing",

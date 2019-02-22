@@ -39,8 +39,10 @@ describe(`Setting datetime then text`, () =>
     it(`must create a TodoItem, by setting its firedate first, then the text`, () =>
     {
         return testChain(
+            setChainProps({ takeScreenshots : false })
             workflow.openApplication(),
             workflow.clickTodoItemCreateButton(),
+            setChainProps({ takeScreenshots : true })
             workflow.setTodoItemText(),                     // Notice clickTimeTag() and setTodoItemText()
             workflow.clickTimeTag(),                        // are inverted here, compared to the previous test
             workflow.clickValidationButton()
@@ -57,7 +59,7 @@ describe(`Setting datetime then text`, () =>
     - [`createTestChain()`](#createtestchain)
     - [`createTestChainSync()`](#createtestchainsync)
     - [`setChainProps()`](#setchainprops)
-    - [`.nested()`](#.nested)
+    - [`.cached()`](#.cached)
 - [Test Steps](#test-steps)
 - [Cookbook](#cookbook)
     - [`Prevent redundant tests`](#prevent-redundant-tests)
@@ -129,18 +131,18 @@ it(`makes no difference whether you use setChainProps() or a regular test step`,
 
 The `setChainProps()` helper is actually implemented as an empty test step: it has no testing or action inside, but returns the new values for the passed props.
 
-### `.nested`
+### `.cached`
 
-The `.nested()` helper is available in both synchronous and asynchronous versions (`createTestChain.nested()` and `createTestChainSync.nested()`). It creates and initializes a test chain with a context and props, as well as a lsit of test steps, but doesn't run it immediately.  
+The `.cached()` helper is available in both synchronous and asynchronous versions (`createTestChain.cached()` and `createTestChainSync.cached()`). It creates and initializes a test chain with a context and props, as well as a lsit of test steps, but doesn't run it immediately.  
 Instead, it can be injected as if it was a regular test step.
 
 ```js
 const testChain = createTestChain(null, { count : 0 })
 
-it(`should run a nested test chain as if it was any other test step`, () =>
+it(`should run a cached test chain as if it was any other test step`, () =>
 {
     // Create and cache a secondary chain. It will inherit the context and the props when the time comes
-    const nestedChain = createTestChainSync.nested(
+    const cachedChain = createTestChainSync.cached(
         (ctx, props) =>
         {
             return { count : props.count + 2 }
@@ -152,14 +154,14 @@ it(`should run a nested test chain as if it was any other test step`, () =>
         }
     )
 
-    // Run the primary chainm which will execute the nested chain in between regular test steps
+    // Run the primary chainm which will execute the cached chain in between regular test steps
     return testChain(
         (ctx, props) =>
         {
             return { count : props.count + 1 }                  // props.count: 0 => 1
         }),
 
-        nestedChain,                                            // props.count: 1 => 3 => 5
+        cachedChain,                                            // props.count: 1 => 3 => 5
 
         (ctx, props) =>
         {
