@@ -7,15 +7,15 @@ const SHORT = 100
 
 describe(`Asynchronous Chains`, () =>
 {
-	describe(`Nested Chain Tests`, () =>
+	describe(`Cached Chain Tests`, () =>
 	{
-		test(`Running a nested chain with 1 test step inside a primary chain`, () =>
+		test(`Running a cached chain with 1 test step inside a primary chain`, () =>
 		{
 			// Create the primary/parent chain
 			const primaryChain = createTestChain({ contextStuff : "value" }, { propStuff : "value", count : 0 })
 			
-			// Create the secondary/nested chain. It will inherit the context and the props when the time comes
-			const nestedChain = createTestChain.nested(
+			// Create the secondary/cached chain. It will inherit the context and the props when the time comes
+			const cachedChain = createTestChain.cached(
 				async (ctx, props) =>
 				{
 					await wait(SHORT)
@@ -23,7 +23,7 @@ describe(`Asynchronous Chains`, () =>
 				}
 			)
 
-			// Run the primary chainm which will execute the nested chain in between regular test steps
+			// Run the primary chainm which will execute the cached chain in between regular test steps
 			return primaryChain(
 				async (ctx, props) =>
 				{
@@ -31,7 +31,7 @@ describe(`Asynchronous Chains`, () =>
 					return { count : props.count + 1 }
 				},
 
-				nestedChain,
+				cachedChain,
 
 				async (ctx, props) =>
 				{
@@ -49,13 +49,13 @@ describe(`Asynchronous Chains`, () =>
 			)
 		})
 
-		test(`Running a nested chain with multiple test steps inside a primary chain`, () =>
+		test(`Running a cached chain with multiple test steps inside a primary chain`, () =>
 		{
 			// Create the primary/parent chain
 			const primaryChain = createTestChain({ contextStuff : "value" }, { propStuff : "value", count : 0 })
 			
-			// Create the secondary/nested chain. It will inherit the context and the props when the time comes
-			const nestedChain = createTestChain.nested(
+			// Create the secondary/cached chain. It will inherit the context and the props when the time comes
+			const cachedChain = createTestChain.cached(
 				async (ctx, props) =>
 				{
 					await wait(SHORT)
@@ -75,7 +75,7 @@ describe(`Asynchronous Chains`, () =>
 				}
 			)
 
-			// Run the primary chain, which will execute the nested chain in between regular test steps
+			// Run the primary chain, which will execute the cached chain in between regular test steps
 			return primaryChain(
 				async (ctx, props) =>
 				{
@@ -83,7 +83,7 @@ describe(`Asynchronous Chains`, () =>
 					return { count : props.count + 1 }
 				},
 
-				nestedChain,
+				cachedChain,
 
 				async (ctx, props) =>
 				{

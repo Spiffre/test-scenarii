@@ -4,29 +4,29 @@ const { createTestChainSync, setChainProps } = require('../../dist/test-scenarii
 
 describe.only(`Synchronous Chains`, () =>
 {
-	describe(`Nested Chain Tests`, () =>
+	describe(`Cached Chain Tests`, () =>
 	{
-		test(`Running a nested chain with 1 test step inside a primary chain`, () =>
+		test(`Running a cached chain with 1 test step inside a primary chain`, () =>
 		{
 			// Create the primary/parent chain
 			const primaryChain = createTestChainSync({ contextStuff : "value" }, { propStuff : "value", count : 0 })
 			
-			// Create the secondary/nested chain. It will inherit the context and the props when the time comes
-			const nestedChain = createTestChainSync.nested(
+			// Create the secondary/cached chain. It will inherit the context and the props when the time comes
+			const cachedChain = createTestChainSync.cached(
 				(ctx, props) =>
 				{
 					return { count : props.count + 1 }
 				}
 			)
 
-			// Run the primary chain, which will execute the nested chain in between regular test steps
+			// Run the primary chain, which will execute the cached chain in between regular test steps
 			primaryChain(
 				(ctx, props) =>
 				{
 					return { count : props.count + 1 }
 				},
 
-				nestedChain,
+				cachedChain,
 
 				(ctx, props) =>
 				{
@@ -41,13 +41,13 @@ describe.only(`Synchronous Chains`, () =>
 			)
 		})
 
-		test(`Running a nested chain with multiple test steps inside a primary chain`, () =>
+		test(`Running a cached chain with multiple test steps inside a primary chain`, () =>
 		{
 			// Create the primary/parent chain
 			const primaryChain = createTestChainSync({ contextStuff : "value" }, { propStuff : "value", count : 0 })
 			
-			// Create the secondary/nested chain. It will inherit the context and the props when the time comes
-			const nestedChain = createTestChainSync.nested(
+			// Create the secondary/cached chain. It will inherit the context and the props when the time comes
+			const cachedChain = createTestChainSync.cached(
 				(ctx, props) =>
 				{
 					return { count : props.count + 1 }
@@ -64,14 +64,14 @@ describe.only(`Synchronous Chains`, () =>
 				}
 			)
 
-			// Run the primary chain, which will execute the nested chain in between regular test steps
+			// Run the primary chain, which will execute the cached chain in between regular test steps
 			primaryChain(
 				(ctx, props) =>
 				{
 					return { count : props.count + 1 }
 				},
 
-				nestedChain,
+				cachedChain,
 
 				(ctx, props) =>
 				{

@@ -55,10 +55,10 @@ export function createTestChain (initialContext, initialProps)
 	}
 }
 
-createTestChain.nested = function nestedTestChain (...testSteps)
+createTestChain.cached = function cachedTestChain (...testSteps)
 {
 	/**
-	 * Context and props are inherited from the parent chain whenever the nested chain is encountered, 
+	 * Context and props are inherited from the parent chain whenever the necachedsted chain is encountered, 
 	 * in order to ensure they are up-to-date
 	 * @param {object} ctx
 	 * @param {object} props
