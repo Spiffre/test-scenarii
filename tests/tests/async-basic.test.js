@@ -7,7 +7,7 @@ const SHORT = 100
 
 describe(`Asynchronous Chains`, () =>
 {
-	describe(`Basic Tests`, () =>
+	describe(`Basic Use`, () =>
 	{
 		test(`Running a test step with empty context and prop objects`, () =>
 		{
@@ -74,6 +74,8 @@ describe(`Asynchronous Chains`, () =>
 			)
 		})
 
+		test.todo(`Running a test chain with null test steps`)
+
 		test(`Running a test step with actual context and prop objects`, () =>
 		{
 			const testChain = createTestChain({ contextStuff : 'Some context stuff' }, { propStuff : 'Some prop stuff' })
@@ -118,7 +120,10 @@ describe(`Asynchronous Chains`, () =>
 				}
 			)
 		})
+	})
 
+	describe(`Error Handling`, () =>
+	{
 		test(`Using a test step which throws an error (anonymous function)`, () =>
 		{
 			const testChain = createTestChain()
@@ -160,6 +165,8 @@ describe(`Asynchronous Chains`, () =>
 				expect(error.message).toMatch('test-scenarii caught an error while attempting to run user-provided test step #0 "doingSomethingReprehensible":')
 			})
 		})
+
+		test.todo(`Using a test step with anon-null, non-function test step`)
 	})
 })
 

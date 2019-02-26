@@ -10,8 +10,10 @@
     This replaces the initial API, which had only one object (`props`) and odd rules regarding updating it—hence the MAJOR/BREAKING udpate.
   - Added the `.cached()` helper on both `createTestChain` and `createTestChainSync`.  
   - Added the name of the test step which failed in the error message, if the test step was provied as a named function.
-  - Added a `cookbook` to the docs, in order to provide examples of how the `test-scenarii` can be used.
+  - Added check up of test steps: null and function are authorized; anything else throws an error.
   - Internal rewrite with async/await. This makes the sync and async code so much more similar, it's uncanny.
+  - Added a `cookbook` to the docs, in order to provide examples of how the `test-scenarii` can be used.
+
 
 ## 0.2.4 (2019-02-18)
 

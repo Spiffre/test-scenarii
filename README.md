@@ -49,6 +49,13 @@ describe(`Setting datetime then text`, () =>
 })
 ```
 
+## Why not just use functions?
+
+Any test workflow will have need for information to be shared among the workflow test. When using vanilla functions, this information (most of it details), will have to be lifted back up to the caller, before being injected in the next function.  
+This accumulates a lot noise at the top, right where we want a clear scenario of what the test is. This clarity is needed in order to catch at a glance what the differences are between entiere series of similar workflows.  
+
+`test-scenarii` offers this clarity by providing a medium where test steps communicate with each others, while only exposing crucial information at the top.  
+
 
 ## Table of Content
 
@@ -58,10 +65,13 @@ describe(`Setting datetime then text`, () =>
     - [`createTestChainSync()`](#createtestchainsync)
     - [`setChainProps()`](#setchainprops)
     - [`.cached()`](#.cached)
-- [Writing Test Steps](#writing-test-steps)
+- [Test Steps](#test-steps)
+    - [What they are](#what-they-are)
+    - [How to write one](#how-to-write-one)
 - [Cookbook](#cookbook)
     - [`Prevent redundant tests`](#prevent-redundant-tests)
     - [`Communication between tests`](#communication-between-tests)
+    - [`Conditional test steps`](#conditional-test-steps)
 - [License](#license)
 
 ## Installation
@@ -85,8 +95,8 @@ The library exposes only a few functions:
 See [`createTestChainSync()`](#createTestChainSync) for the synchronous version.  
 
 The new API acknowledges that the props passed from test to test have different update rates: some of them have no reason to change (references to the browser, the webservices URL, etc), while others are meant to be updated as a way to communicate between test steps (whether to takeScreenshots or not, to run tests, some data created in a test step reused in another, etc).  
-- The first parameter, the `context`, is the one not meant to be updated. `Object.freeze()` is used on the `context` as soone as it's passed to the chain creator. Because `Object.freeze()` only freezes shallowly, it's still possible to change context values at a deeper level. The freeze is only there to safeguard against a distraction mistake.  
-- The second parameter, `props`, is meant as a channel between test steps. Its values can be updated by simply returning an object from the test step; this object is shallow merged with the pre-exisiting props and passed to the next test step.  
+- The first parameter, the `context`, is the one not meant to be updated. `Object.freeze()` is used on the `context` as soon as it is passed to the chain creator. Because `Object.freeze()` only freezes shallowly, it is still possible to change context values at a deeper level. The freeze is only there to safeguard against a distraction mistake.  
+- The second parameter, `props`, is meant as a channel between test steps. Its values can be updated by simply returning an object from the test step; this object is shallow merged with the exisiting props and passed to the next test step.  
 
 
 ### `createTestChainSync`
@@ -111,7 +121,7 @@ Notice the absence of the `return` keyword before the call to `testChain()`: a t
 
 The `setChainProps()` helper updates prop values somewhere along the chain—but from the outside.  
 
-While udpating props is done primarily from inside the test steps, it can be super convenient to set some props from the outside. At the very least, it can help readability at times.  
+While updating props is done primarily from inside the test steps, it can be super convenient to set some props from the outside. At the very least, it can help readability at times.  
 
 ```js
 let testChain = createTestChain({}, { runProfiling : false })
@@ -144,7 +154,7 @@ it(`should run a cached test chain as if it were any other test step`, () =>
         (ctx, props) => ({ count : props.count + 2 })
     )
 
-    // Run the primary chainm which will execute the cached chain in between regular test steps
+    // Run the primary chain, which will execute the cached chain in between regular test steps
     return testChain(
         (ctx, props) => ({ count : props.count + 1 }),          // props.count: 0 => 1
         cachedChain,                                            // props.count: 1 => 3 => 5
@@ -154,40 +164,51 @@ it(`should run a cached test chain as if it were any other test step`, () =>
 })
 ```
 
-## Writing Test Steps
+## Test Steps
 
-The way the test steps are written is key. The bare minimum they should do is separate the action they perform from the test(s), in a way to is prop-controlled.  
+### What they are
 
-A test step should return a function which accepts 2 objects as its parameters (`ctx` and `props`). Although anonymous functions will work, named functions are recommended, as they will improve the readability of errors when they occur.
+A test step is simply a function, which accepts 2 objects as its parameters (`ctx` and `props`).  
 
-Examples use Puppeteer to navigate a project via Chromium instance.  
+Anything else will cause an error to be thrown, with the exception of `null`: when encountering a `null` test step, test-scenarii will silently skip it. This facilitates the use of [conditional test steps](#conditional-test-steps).  
 
-Test steps can be made parametric via the following pattern:
+Anonymous functions will work, but named functions are recommended: their name will appear in error messages, which improves debuggability.  
+
+### How to write one
+
+The way the test steps are written is key. In order to maximize flexibility and reuse, it's a good practice to separate the action they perform from the test(s). Running the tests should be conditioned via props such as `runTests` or `takeScreenshots`. This will allow high level test chains to reuse low-level ones without necessarily re-performing all the tests they list. This is of course highly dependent on the knowledge the developer has of what is susceptible to fail when performing specific actions.  
+
+The following example use Puppeteer to navigate a project.  
 
 ```js
-function clickTimeTag (timeTag)
+module.exports =
 {
-    return async function clickTimeTagAndTest (ctx, props) =>
+    clickTimeTag (timeTag)
     {
-        // The Action
-        await ctx.page.click(`button[data-time-tag=${timeTag}`)
-        await wait(300)
-
-        // The Test
-        if (props.runTests)
+        return async function clickTimeTag (ctx, props) =>
         {
-            // Snapshot-test the UI (toggleable at will via context props)
-            const html = await ctx.page.$eval('.whole-panel', (el) => el.outerHTML)
-            expect(html).toMatchSnapshot()
-        }
+            // The Action
+            await ctx.page.click(`button[data-time-tag=${timeTag}`)
+            await wait(300)
 
-        // Another Test
-        if (props.runTests && props.takeScreenshots)
-        {
-            // Screenshot-test the UI (also toggleable at will via context props)
-            await ctx.page.screenshot({ path : `clickTimeTag-${Date.now()}` })
+            // The Test
+            if (props.runTests)
+            {
+                // Snapshot-test the UI (toggleable at will via context props)
+                const html = await ctx.page.$eval('.whole-panel', (el) => el.outerHTML)
+                expect(html).toMatchSnapshot()
+            }
+
+            // Another Test
+            if (props.runTests && props.takeScreenshots)
+            {
+                // Screenshot-test the UI (also toggleable at will via context props)
+                await ctx.page.screenshot({ path : `clickTimeTag-${Date.now()}` })
+            }
         }
     }
+
+    // [...] Other test steps
 }
 ```
 
@@ -199,6 +220,7 @@ await page.goto('http://localhost:3000')
 
 const testChain = createTestChain({ /* ctx */ page }, { /* props */ runTests : true,  takeScreenshots : false })
 ```
+
 
 ## Cookbook
 
@@ -242,7 +264,7 @@ There's an easy way to prevent that:
     })
 ```
 
-If the test steps are written properly, the testing, which is prop-controlled via `runTests`, and the screenshot-taking, which is prop-controlled via `takeScreenshots`, is going to be bypassed the second time around. Although this is a contrieved example, it is clear how it will save time and resources in the case of numerous scenarii sharing a common base.
+If the test steps are written properly, the testing, which is prop-controlled via `runTests`, and the screenshot-taking, which is prop-controlled via `takeScreenshots`, is going to be bypassed the second time around. Although this is a contrived example, it is clear how it will save time and resources in the case of numerous scenarii sharing a common base.
 
 ### Communication between tests
 
@@ -279,7 +301,63 @@ function selectTodoItem ()
 
 This lets any test chain handle a "previously created" todo item, without having itself any knowledge of the UUID.
 
+### Conditional test steps
+
+When creating test chains, it can be convenient to condition some steps. It can be done easily, thanks to `null` being a valid value for a test step.  
+Here's an example with a parameterized cached test chain:
+
+```js
+/**
+ * Create a todo with text and a timetag. Optionally close the panel
+ * @param {object} options
+ * @param {string} options.text
+ * @param {string} options.timeTag
+ * @param {boolean} [options.validateCreation]
+ */
+function createTodoItem (options = {})
+{
+    const { text, timeTag, validateCreation : true } = options
+
+    return createTestChain.cached(
+        testStep.clickTodoItemCreateButton(),
+        testStep.clickTimeTag(timeTag),
+        testStep.setTodoItemText(text),
+        validateCreation ? testStep.clickValidationButton() : null
+    )
+}
+```
+
+This cached test chain can be used in 2 different ways:
+
+```js
+it(`should create a todo item`, () =>
+{
+    return testChain(
+        testStep.openApplication(),
+        testStep.createTodoItem({ text : 'The laundry!', timetag : 'yesterday', validateCreation : true })
+        (ctx, props) =>
+        {
+            // Perform some checks
+
+        }
+    )
+}
+
+it(`should cancel right before creating a todo item`, () =>
+{
+    return testChain(
+        testStep.openApplication(),
+        testStep.createTodoItem({ text : 'The laundry!', timetag : 'yesterday', validateCreation : false })
+        testStep.clickCancelButton()
+        (ctx, props) =>
+        {
+            // Perform some checks
+
+        }
+    )
+}
+```
 
 ## License
 
-MIT
+test-scenarii is distributed under MIT license

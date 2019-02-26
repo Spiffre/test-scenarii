@@ -24,6 +24,20 @@ export function createTestChain (initialContext, initialProps)
 
 		for (const testStep of testSteps)
 		{
+			// Check if the test step is volutarily not a function (perhaps the result of a conditional statement)
+			if (testStep === null)
+			{
+				// testContext remains the same
+				continue
+			}
+
+			// Handle error values of a test step
+			if (typeof testStep !== 'function')
+			{
+				throw new Error(`A test step must be either a function or null; received "${testStep}" as test step #${testStepIndex} instead`)
+			}
+
+			// Run the test step
 			try
 			{
 				// Execute the testStep and pass it the current ctx and the props
