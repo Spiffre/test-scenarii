@@ -1,6 +1,6 @@
 # CHANGELOG.md
 
-## 1.0.0 (unreleased)
+## 1.0.0 (2019-02-26)
 
   - New API. The main API is now:  
     ```js

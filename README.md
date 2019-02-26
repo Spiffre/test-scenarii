@@ -51,10 +51,10 @@ describe(`Setting datetime then text`, () =>
 
 ## Why not just use functions?
 
-Any test workflow will have need for information to be shared among the workflow test. When using vanilla functions, this information (most of it details), will have to be lifted back up to the caller, before being injected in the next function.  
-This accumulates a lot noise at the top, right where we want a clear scenario of what the test is. This clarity is needed in order to catch at a glance what the differences are between entiere series of similar workflows.  
+Any real-life test workflow will rely on information being shared among individual tests. When using vanilla functions, this information (most of it details), will have to be lifted back up to the caller, before being passed to the next function.  
+This leads to the accumulation of a lot noise at the top, right where we want a clear outline of what the test does. This clarity is needed in order to catch (at a glance) what the differences are between entiere series of similar workflows.  
 
-`test-scenarii` offers this clarity by providing a medium where test steps communicate with each others, while only exposing crucial information at the top.  
+`test-scenarii` offers this clarity by providing a means for tests steps to communicate with each others while only exposing crucial information at the top.  
 
 
 ## Table of Content
