@@ -86,6 +86,34 @@ describe.only(`Synchronous Chains`, () =>
 			)
 		})
 
-		test.todo(`Running deepling nested test chains`)
+		test(`Running deeply nested test chains`, () =>
+		{
+			const chainA = createTestChainSync.cached(
+				(ctx, props) => ({ buffer : props.buffer + 'aaa' })
+			)
+
+			const chainB = createTestChainSync.cached(
+				(ctx, props) => ({ buffer : props.buffer + 'bbb' }),
+
+				chainA,
+
+				(ctx, props) => ({ buffer : props.buffer + 'bbb' })
+			)
+
+			const chainC = createTestChainSync.cached(
+				(ctx, props) => ({ buffer : props.buffer + 'ccc' }),
+
+				chainB,
+
+				(ctx, props) => ({ buffer : props.buffer + 'ccc' })
+			)
+
+			// Create the primary/parent chain
+			const primaryChain = createTestChainSync(null, { buffer : '' })
+
+			// Run the chain
+			const finalProps = primaryChain(chainC)
+			expect(finalProps.buffer).toBe('cccbbbaaabbbccc')
+		})
 	})
 })

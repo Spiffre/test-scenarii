@@ -101,6 +101,56 @@ describe(`Asynchronous Chains`, () =>
 			)
 		})
 
-		test.todo(`Running deepling nested test chains`)
+		test(`Running deeply nested test chains`, () =>
+		{
+			const chainA = createTestChain.cached(
+				async (ctx, props) =>
+				{
+					await wait(SHORT)
+					return { buffer : props.buffer + 'aaa' }
+				}
+			)
+
+			const chainB = createTestChain.cached(
+				async (ctx, props) =>
+				{
+					await wait(SHORT)
+					return { buffer : props.buffer + 'bbb' }
+				},
+
+				chainA,
+
+				async (ctx, props) =>
+				{
+					await wait(SHORT)
+					return { buffer : props.buffer + 'bbb' }
+				}
+			)
+
+			const chainC = createTestChain.cached(
+				async (ctx, props) =>
+				{
+					await wait(SHORT)
+					return { buffer : props.buffer + 'ccc' }
+				},
+
+				chainB,
+
+				async (ctx, props) =>
+				{
+					await wait(SHORT)
+					return { buffer : props.buffer + 'ccc' }
+				}
+			)
+
+			// Create the primary/parent chain
+			const primaryChain = createTestChain(null, { buffer : '' })
+
+			// Run the chain
+			return primaryChain(chainC).then( (finalProps) =>
+			{
+				expect(finalProps.buffer).toBe('cccbbbaaabbbccc')
+			})
+		})
 	})
 })

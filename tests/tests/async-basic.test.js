@@ -74,7 +74,38 @@ describe(`Asynchronous Chains`, () =>
 			)
 		})
 
-		test.todo(`Running a test chain with null test steps`)
+		test(`Running a test step with undefined context and prop objects, and a prop update from a test step`, () =>
+		{
+			const testChain = createTestChain()
+
+			return testChain(
+				(ctx, props) => ({ initialized : true }),
+				(ctx, props) => expect(props.initialized).toBe(true)
+			)
+		})
+
+		test(`Running a test step with undefined context and prop objects, and a prop update from setChainProps`, () =>
+		{
+			const testChain = createTestChain()
+
+			return testChain(
+				(ctx, props) => ({ initialized : true }),
+				(ctx, props) => expect(props.initialized).toBe(true)
+			)
+		})
+
+		test(`Running a test chain with null test steps`, () =>
+		{
+			const testChain = createTestChain(null, { count : 0 })
+			
+			return testChain(
+				null,
+				null,
+				(ctx, props) => ({ count : props.count + 1 }),
+				null,
+				(ctx, props) => expect(props.count).toBe(1)
+			)
+		})
 
 		test(`Running a test step with actual context and prop objects`, () =>
 		{
@@ -166,7 +197,21 @@ describe(`Asynchronous Chains`, () =>
 			})
 		})
 
-		test.todo(`Using a test step with anon-null, non-function test step`)
+		test(`Using a test step with a non-null, non-function test step`, () =>
+		{
+			const testChain = createTestChain()
+			
+			return testChain(
+				undefined
+			)
+
+			// Error checking
+			.catch( (error) =>
+			{
+				expect(error).toBeInstanceOf(Error)
+				expect(error.message).toMatch('A test step must be either a function or null; received "undefined" as test step #0 instead')
+			})
+		})
 	})
 })
 
